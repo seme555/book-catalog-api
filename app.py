@@ -28,3 +28,32 @@ def init_db() -> None:
                 author TEXT NOT NULL,
                 year INTEGER
             )
+            """
+        )
+
+
+@app.get("/health")
+def health():
+    return jsonify({"status": "ok"})
+
+
+@app.get("/books")
+def list_books():
+    with get_db() as conn:
+        rows = conn.execute(
+            "SELECT id, title, author, year FROM books ORDER BY id"
+        ).fetchall()
+    return jsonify([dict(row) for row in rows])
+
+
+@app.get("/books/<int:book_id>")
+def get_book(book_id: int):
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT id, title, author, year FROM books WHERE id = ?",
+            (book_id,),
+        ).fetchone()
+    if row is None:
+        return jsonify({"error": "Book not found"}), 404
+    return jsonify(dict(row))
+
