@@ -87,3 +87,33 @@ def update_book(book_id: int):
     title = (payload.get("title") or "").strip()
     author = (payload.get("author") or "").strip()
     year = payload.get("year")
+
+    if not title or not author:
+        return jsonify({"error": "title and author are required"}), 400
+
+    with get_db() as conn:
+        cursor = conn.execute(
+            "UPDATE books SET title = ?, author = ?, year = ? WHERE id = ?",
+            (title, author, year, book_id),
+        )
+        if cursor.rowcount == 0:
+            return jsonify({"error": "Book not found"}), 404
+        row = conn.execute(
+            "SELECT id, title, author, year FROM books WHERE id = ?",
+            (book_id,),
+        ).fetchone()
+    return jsonify(dict(row))
+
+
+@app.delete("/books/<int:book_id>")
+def delete_book(book_id: int):
+    with get_db() as conn:
+        cursor = conn.execute("DELETE FROM books WHERE id = ?", (book_id,))
+        if cursor.rowcount == 0:
+            return jsonify({"error": "Book not found"}), 404
+    return "", 204
+
+
+if __name__ == "__main__":
+    init_db()
+    app.run(debug=True)
