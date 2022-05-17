@@ -57,3 +57,33 @@ def get_book(book_id: int):
         return jsonify({"error": "Book not found"}), 404
     return jsonify(dict(row))
 
+
+@app.post("/books")
+def create_book():
+    payload = request.get_json(silent=True) or {}
+    title = (payload.get("title") or "").strip()
+    author = (payload.get("author") or "").strip()
+    year = payload.get("year")
+
+    if not title or not author:
+        return jsonify({"error": "title and author are required"}), 400
+
+    with get_db() as conn:
+        cursor = conn.execute(
+            "INSERT INTO books (title, author, year) VALUES (?, ?, ?)",
+            (title, author, year),
+        )
+        book_id = cursor.lastrowid
+        row = conn.execute(
+            "SELECT id, title, author, year FROM books WHERE id = ?",
+            (book_id,),
+        ).fetchone()
+    return jsonify(dict(row)), 201
+
+
+@app.put("/books/<int:book_id>")
+def update_book(book_id: int):
+    payload = request.get_json(silent=True) or {}
+    title = (payload.get("title") or "").strip()
+    author = (payload.get("author") or "").strip()
+    year = payload.get("year")
