@@ -14,3 +14,10 @@ Introductory Flask + SQLite CRUD API for a small book catalog.
 | DELETE | `/books/<id>` | Delete book |
 
 ## Setup
+
+```bash
+pip install -r requirements.txt
+python app.py
+```
+
+The SQLite database file `books.db` is created on first run.
