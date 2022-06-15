@@ -21,3 +21,11 @@ python app.py
 ```
 
 The SQLite database file `books.db` is created on first run.
+
+## Author
+
+Semere Abera — [github.com/seme555](https://github.com/seme555)
+
+## License
+
+MIT
